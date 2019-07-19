@@ -1,0 +1,18 @@
+version: '3.6'
+
+services:
+  api:
+    build:
+      context: .
+      target: dev
+    volumes:
+      - .:/api
+    ports:
+      - 2345:2345
+      - 8000:8000
+    security_opt:
+        - "seccomp:unconfined" # required for remote debugging
+    restart: always
+      
+    #  go build -o main
+    #dlv attach --headless --listen=:2345 $(pgrep main)
