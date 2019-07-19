@@ -10,7 +10,7 @@ RUN go build -o main
 
 # ---- DEV ----
 FROM base AS dev
-ENTRYPOINT reflex -r '\.go$' -s -- sh -c 'go build && dlv debug -l 0.0.0.0:2345 --headless --api-version=2 --log=true'
+ENTRYPOINT reflex -r '\.go$' -s -- sh -c 'go build -o main && dlv exec --listen :2345 --continue --headless  --accept-multiclient --api-version=2 --log=true /api/main'
 
 # ---- PROD ----
 FROM alpine AS prod

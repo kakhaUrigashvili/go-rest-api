@@ -13,6 +13,3 @@ services:
     security_opt:
         - "seccomp:unconfined" # required for remote debugging
     restart: always
-      
-    #  go build -o main
-    #dlv attach --headless --listen=:2345 $(pgrep main)
