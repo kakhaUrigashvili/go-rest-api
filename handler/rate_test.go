@@ -46,30 +46,61 @@ func TestSearchRateHandler(t *testing.T) {
 			Price: 925,
 		},
 	}}
-	req, err := http.NewRequest("GET", "/rates/search", nil)
-	if err != nil {
-		t.Fatal(err)
+
+	type test struct {
+        start string
+		end   string
+		expectedBody string
+		expectedCode int
+    }
+
+	// table driven tests
+    tests := []test{
+        {start: "2015-07-01T07:00:00-05:00", end: "2015-07-01T12:00:00-05:00", expectedBody: "1750", expectedCode: http.StatusOK},
+		{start: "2015-07-04T15:00:00+00:00", end: "2015-07-04T20:00:00+00:00", expectedBody: "2000", expectedCode: http.StatusOK},
+		{start: "2015-07-04T07:00:00+05:00", end: "2015-07-04T20:00:00+05:00", expectedBody: "unavailable", expectedCode: http.StatusOK},
+		{start: "", end: "2015-07-04T20:00:00+00:00", expectedBody: "start query parameter is required to be valid ISO-8601 datetime", expectedCode: http.StatusBadRequest},
+		{start: "2015-07-04T20:00:00+00:00", end: "", expectedBody: "end query parameter is required to be valid ISO-8601 datetime", expectedCode: http.StatusBadRequest},
 	}
 
-	q := req.URL.Query()
-	q.Add("start", "2015-07-01T07:00:00-05:00")
-	q.Add("end", "2015-07-01T12:00:00-05:00")
-	req.URL.RawQuery = q.Encode()
-	
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(SearchRateHandler)
+	for _, tc := range tests {
+        req, err := http.NewRequest("GET", "/rates/search", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	handler.ServeHTTP(rr, req)
+		q := req.URL.Query()
+		q.Add("start", tc.start)
+		q.Add("end", tc.end)
+		req.URL.RawQuery = q.Encode()
+		
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(SearchRateHandler)
 
-	// Check the status code is what we expect.
-	assert.Equal(t, http.StatusOK, rr.Code)
+		handler.ServeHTTP(rr, req)
 
-	// Check the response body is what we expect.
-	expected := `1750`
-	assert.Equal(t, expected, strings.Trim(rr.Body.String(), "\n"))
+		// Check the status code is what we expect.
+		assert.Equal(t, tc.expectedCode, rr.Code)
 
+		// Check the response body is what we expect.
+		assert.Equal(t, tc.expectedBody, strings.Trim(rr.Body.String(), "\n"))
+    }
 }
 func TestGetRatesHandler(t *testing.T) {
+	rates = model.RateCollection{Rates: []model.Rate{
+		{
+			Days: "mon,tues,thurs",
+			Times: "0800-2200",
+			TimeZone: "America/Chicago",
+			Price: 7777,
+		},
+		{
+			Days: "fri,sat,sun",
+			Times: "0700-2300",
+			TimeZone: "America/Chicago",
+			Price: 9999,
+		},
+	}}
 	req, err := http.NewRequest("GET", "/rates", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -84,7 +115,7 @@ func TestGetRatesHandler(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rr.Code)
 
 	// Check the response body is what we expect.
-	expected := `{"rates":[]}`
+	expected := `{"rates":[{"days":"mon,tues,thurs","times":"0800-2200","tz":"America/Chicago","price":7777},{"days":"fri,sat,sun","times":"0700-2300","tz":"America/Chicago","price":9999}]}`
 	assert.Equal(t, expected, strings.Trim(rr.Body.String(), "\n"))
 
 }
