@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -38,23 +37,36 @@ func validateDateParameters(w http.ResponseWriter, r *http.Request) error {
 
 func calculateRate(dateRange model.Range) string {
 
-	res := "unavailable"
+	unavailable := "unavailable"
+	var res string
+
 	// input cannot span multiple days
 	if !dateEqual(dateRange.StartTime, dateRange.EndTime) {
-		return res
+		return unavailable
 	}
 
 	weekday := dateRange.WeekdayAbbreviation()
 	start := dateRange.HourMinuteStart()
 	end := dateRange.HourMinuteEnd()
 
+	found := false
+	
+	// searching for rate
 	for _, rate := range rates.Rates {
-		log.Println(rate.HourMinuteStart(), rate.HourMinuteEnd())
 		if strings.Contains(rate.Days, weekday) &&
-			start >= rate.HourMinuteStart() && end <= rate.HourMinuteEnd() {
-			log.Println("found")
-			return strconv.Itoa(rate.Price)
+			start >= rate.HourMinuteStart() && 
+			end <= rate.HourMinuteEnd() {
+			// checking if we already have rate that we found before
+		    if found {
+				return unavailable // returning unavailable since found more than 1 rate
+			}		
+			found = true
+			res = strconv.Itoa(rate.Price)
 		}
+	}
+	
+	if !found {
+		return unavailable
 	}
 
 	return res
