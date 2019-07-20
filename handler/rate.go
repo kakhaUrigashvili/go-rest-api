@@ -81,7 +81,7 @@ func SearchRateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var dateRange model.Range
-
+	
 	err = decoder.Decode(&dateRange, r.URL.Query())
 
 	if err != nil {
@@ -107,7 +107,3 @@ func CreateRatesHandler(w http.ResponseWriter, r *http.Request) {
 	rates = newRates
 	json.NewEncoder(w).Encode(rates)
 }
-
-// func SetRates (r model.RateCollection) {
-//   rates = r
-// }
