@@ -15,10 +15,10 @@ func main() {
 
 	routePrefix := "/api/v1"
 
-	// Route handles & endpoints
-	r.HandleFunc(routePrefix+"/rates/search", handler.RateSearch).Methods("GET")
-	r.HandleFunc(routePrefix+"/rates", handler.GetRates).Methods("GET")
-	r.HandleFunc(routePrefix+"/rates", handler.CreateRates).Methods("POST")
+	// Route handlers
+	r.HandleFunc(routePrefix+"/rates/search", handler.SearchRateHandler).Methods("GET")
+	r.HandleFunc(routePrefix+"/rates", handler.GetRatesHandler).Methods("GET")
+	r.HandleFunc(routePrefix+"/rates", handler.CreateRatesHandler).Methods("POST")
 
 	// Start server
 	log.Fatal(http.ListenAndServe(":8000", r))

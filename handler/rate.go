@@ -72,8 +72,8 @@ func calculateRate(dateRange model.Range) string {
 	return res
 }
 
-// RateSearch searches rate based on start and end time
-func RateSearch(w http.ResponseWriter, r *http.Request) {
+// SearchRateHandler searches rate based on start and end time
+func SearchRateHandler(w http.ResponseWriter, r *http.Request) {
 	err := validateDateParameters(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -93,17 +93,21 @@ func RateSearch(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(res))
 }
 
-// GetRates gets all rates
-func GetRates(w http.ResponseWriter, r *http.Request) {
+// GetRatesHandler gets all rates
+func GetRatesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(rates)
 }
 
-// CreateRates updates all rates
-func CreateRates(w http.ResponseWriter, r *http.Request) {
+// CreateRatesHandler updates all rates
+func CreateRatesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var newRates model.RateCollection
 	_ = json.NewDecoder(r.Body).Decode(&newRates)
 	rates = newRates
 	json.NewEncoder(w).Encode(rates)
 }
+
+// func SetRates (r model.RateCollection) {
+//   rates = r
+// }
