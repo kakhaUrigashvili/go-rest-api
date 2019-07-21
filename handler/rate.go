@@ -78,7 +78,16 @@ func calculateRate(startDate, endDate time.Time) string {
 	return res
 }
 
-// SearchRateHandler searches rate based on start and end time
+// SearchRateHandler godoc
+// @Summary Search rate
+// @Description search rate by start and end date.
+// @Tags rates
+// @Produce plain
+// @Param start query string true "date/time as ISO-8601 with timezone"
+// @Param end query string true "date/time as ISO-8601 with timezone"
+// @Success 200 {string} string
+// @Failure 400 {string} string
+// @Router /rates/search [get]
 func SearchRateHandler(w http.ResponseWriter, r *http.Request) {
 
 	errorMessage := "query parameter is required to be valid ISO-8601 datetime"
@@ -97,13 +106,25 @@ func SearchRateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(res))
 }
 
-// GetRatesHandler gets all rates
+// GetRatesHandler godoc
+// @Summary Get all rates
+// @Description get all rates available in the system
+// @Tags rates
+// @Success 200 {object} model.RateCollection
+// @Router /rates [get]
 func GetRatesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(rates)
 }
 
-// CreateRatesHandler updates all rates
+// CreateRatesHandler godoc
+// @Summary Upload rates
+// @Description upload rates using json payload
+// @Tags rates
+// @Accept  json
+// @Param account body model.RateCollection true "Add rates"
+// @Success 201
+// @Router /rates [post]
 func CreateRatesHandler(w http.ResponseWriter, r *http.Request) {
 	var newRates model.RateCollection
 	_ = json.NewDecoder(r.Body).Decode(&newRates)

@@ -7,10 +7,10 @@ import (
 
 // Rate struct
 type Rate struct {
-	Days     string `json:"days"`
-	Times    string `json:"times"`
-	TimeZone string `json:"tz"`
-	Price    int    `json:"price"`
+	Days     string `json:"days" example:"mon,tues,thurs"`
+	Times    string `json:"times" example:"0900-2100"`
+	TimeZone string `json:"tz" example:"America/Chicago"`
+	Price    int    `json:"price" example:"1500"`
 }
 
 // HourMinuteStart returns integer respresenting hour and minute of start time

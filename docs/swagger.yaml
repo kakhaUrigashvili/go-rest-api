@@ -1,16 +1,90 @@
-basePath: /api/v1
-host: localhost:8080
+basePath: '{{.BasePath}}'
+definitions:
+  model.Rate:
+    properties:
+      days:
+        example: mon,tues,thurs
+        type: string
+      price:
+        example: 1500
+        type: integer
+      times:
+        example: 0900-2100
+        type: string
+      tz:
+        example: America/Chicago
+        type: string
+    type: object
+  model.RateCollection:
+    properties:
+      rates:
+        items:
+          $ref: '#/definitions/model.Rate'
+        type: array
+    type: object
+host: '{{.Host}}'
 info:
-  contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
-  description: This is a sample server celler server.
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
-  title: Swagger Example API
-  version: "1.0"
-paths: {}
+  contact: {}
+  description: '{{.Description}}'
+  license: {}
+  title: '{{.Title}}'
+  version: '{{.Version}}'
+paths:
+  /rates:
+    get:
+      description: get all rates available in the system
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.RateCollection'
+            type: object
+      summary: Get all rates
+      tags:
+      - rates
+    post:
+      consumes:
+      - application/json
+      description: upload rates using json payload
+      parameters:
+      - description: Add rates
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/model.RateCollection'
+          type: object
+      responses:
+        "201": {}
+      summary: Upload rates
+      tags:
+      - rates
+  /rates/search:
+    get:
+      description: search rate by start and end date.
+      parameters:
+      - description: date/time as ISO-8601 with timezone
+        in: query
+        name: start
+        required: true
+        type: string
+      - description: date/time as ISO-8601 with timezone
+        in: query
+        name: end
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Search rate
+      tags:
+      - rates
 swagger: "2.0"
