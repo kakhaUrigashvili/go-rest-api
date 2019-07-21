@@ -17,7 +17,7 @@ Navigate to http://localhost:8000
 
 ## Test
 
-To run tests run the following command
+To run the tests run the following command
 
 ```
 docker-compose run --entrypoint='go test -v ./...' api 
