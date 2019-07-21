@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -35,6 +34,7 @@ func toWeekdayAbbreviation(time time.Time) string {
 	weekdays := [7]string{"sun", "mon", "tues", "wed", "thurs", "fri", "sat"}
 	return weekdays[index]
 }
+
 func toHourMinute(time time.Time) int {
 	return time.Hour()*100 + time.Minute()
 }
@@ -93,8 +93,6 @@ func SearchRateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(start, end)
-
 	res := calculateRate(start, end)
 	w.Write([]byte(res))
 }
@@ -107,9 +105,8 @@ func GetRatesHandler(w http.ResponseWriter, r *http.Request) {
 
 // CreateRatesHandler updates all rates
 func CreateRatesHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	var newRates model.RateCollection
 	_ = json.NewDecoder(r.Body).Decode(&newRates)
 	rates = newRates
-	json.NewEncoder(w).Encode(rates)
+	w.WriteHeader(http.StatusCreated)
 }

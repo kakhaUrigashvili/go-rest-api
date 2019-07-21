@@ -117,7 +117,6 @@ func TestGetRatesHandler(t *testing.T) {
 	// Check the response body is what we expect.
 	expected := `{"rates":[{"days":"mon,tues,thurs","times":"0800-2200","tz":"America/Chicago","price":7777},{"days":"fri,sat,sun","times":"0700-2300","tz":"America/Chicago","price":9999}]}`
 	assert.Equal(t, expected, strings.Trim(rr.Body.String(), "\n"))
-
 }
 func TestCreateRatesHandler(t *testing.T) {
 
@@ -148,9 +147,5 @@ func TestCreateRatesHandler(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	// Check the status code is what we expect.
-	assert.Equal(t, http.StatusOK, rr.Code)
-
-	// Check the response body is what we expect.
-	expected := `{"rates":[{"days":"mon,tues,thurs","times":"0900-2100","tz":"America/Chicago","price":1500},{"days":"fri,sat,sun","times":"0900-2100","tz":"America/Chicago","price":2000}]}`
-	assert.Equal(t, expected, strings.Trim(rr.Body.String(), "\n"))
+	assert.Equal(t, http.StatusCreated, rr.Code)
 }
