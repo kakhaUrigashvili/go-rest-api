@@ -24,8 +24,8 @@ func main() {
 
 	basePath := "/api/v1"
 
-	host := getEnv("HOST", "localhost") 
-	port := getEnv("PORT", "8000") 
+	host := getEnv("HOST", "localhost")
+	port := getEnv("PORT", "8000")
 
 	// programatically set swagger info
 	docs.SwaggerInfo.Title = "Rest API Spot Hero"
@@ -42,8 +42,8 @@ func main() {
 	r.HandleFunc(basePath+"/rates", handler.GetRatesHandler).Methods("GET")
 	r.HandleFunc(basePath+"/rates", handler.CreateRatesHandler).Methods("POST")
 	r.Handle("/metrics", promhttp.Handler()).Methods("GET")
-	r.PathPrefix("/").Handler(httpSwagger.Handler(httpSwagger.URL("http://" +docs.SwaggerInfo.Host + "/docs/doc.json")))
+	r.PathPrefix("/").Handler(httpSwagger.Handler(httpSwagger.URL("http://" + docs.SwaggerInfo.Host + "/docs/doc.json")))
 
 	// Start server
-	log.Fatal(http.ListenAndServe(":" + port, r))
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
