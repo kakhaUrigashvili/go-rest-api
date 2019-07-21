@@ -3,23 +3,34 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/kakhaUrigashvili/go-rest-api/docs"
 	"github.com/kakhaUrigashvili/go-rest-api/handler"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/swaggo/http-swagger"
-	"github.com/kakhaUrigashvili/go-rest-api/docs"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
+
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
+}
 
 // Main function
 func main() {
 
 	basePath := "/api/v1"
 
+	host := getEnv("HOST", "localhost") 
+	port := getEnv("PORT", "8000") 
+
 	// programatically set swagger info
 	docs.SwaggerInfo.Title = "Rest API Spot Hero"
 	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = "localhost:8000"
+	docs.SwaggerInfo.Host = host + ":" + port
 	docs.SwaggerInfo.BasePath = basePath
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
@@ -34,5 +45,5 @@ func main() {
 	r.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
 
 	// Start server
-	log.Fatal(http.ListenAndServe(":8000", r))
+	log.Fatal(http.ListenAndServe(":" + port, r))
 }
