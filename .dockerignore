@@ -2,3 +2,4 @@ docker-compose.yml
 Dockerfile
 go-rest-api
 __debug_bin
+.git
