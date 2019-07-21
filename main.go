@@ -42,7 +42,7 @@ func main() {
 	r.HandleFunc(basePath+"/rates", handler.GetRatesHandler).Methods("GET")
 	r.HandleFunc(basePath+"/rates", handler.CreateRatesHandler).Methods("POST")
 	r.Handle("/metrics", promhttp.Handler()).Methods("GET")
-	r.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
+	r.PathPrefix("/").Handler(httpSwagger.Handler(httpSwagger.URL("http://" +docs.SwaggerInfo.Host + "/docs/doc.json")))
 
 	// Start server
 	log.Fatal(http.ListenAndServe(":" + port, r))
