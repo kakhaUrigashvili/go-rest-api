@@ -22,11 +22,11 @@ func dateEqual(date1, date2 time.Time) bool {
 }
 
 func timeIn(origTime time.Time, name string) time.Time {
-    loc, err := time.LoadLocation(name)
-    if err != nil {
-        panic(err)
-    }
-    return origTime.In(loc)
+	loc, err := time.LoadLocation(name)
+	if err != nil {
+		panic(err)
+	}
+	return origTime.In(loc)
 }
 
 func toWeekdayAbbreviation(time time.Time) string {
@@ -43,7 +43,7 @@ func calculateRate(startDate, endDate time.Time) string {
 	unavailable := "unavailable"
 	var res string
 	found := false
-	
+
 	// searching for rate
 	for _, rate := range rates.Rates {
 		// convert to timezone matching the rates data
@@ -60,17 +60,17 @@ func calculateRate(startDate, endDate time.Time) string {
 		end := toHourMinute(endDateLoc)
 
 		if strings.Contains(rate.Days, weekday) &&
-			start >= rate.HourMinuteStart() && 
+			start >= rate.HourMinuteStart() &&
 			end <= rate.HourMinuteEnd() {
 			// checking if we already have rate that we found before
-		    if found {
+			if found {
 				return unavailable // returning unavailable since found more than 1 rate
-			}		
+			}
 			found = true
 			res = strconv.Itoa(rate.Price)
 		}
 	}
-	
+
 	if !found {
 		return unavailable
 	}
@@ -93,12 +93,12 @@ func SearchRateHandler(w http.ResponseWriter, r *http.Request) {
 	errorMessage := "query parameter is required to be valid ISO-8601 datetime"
 	start, err := time.Parse(time.RFC3339, r.URL.Query().Get("start"))
 	if err != nil {
-		http.Error(w, "start " + errorMessage, http.StatusBadRequest)
+		http.Error(w, "start "+errorMessage, http.StatusBadRequest)
 		return
 	}
 	end, err := time.Parse(time.RFC3339, r.URL.Query().Get("end"))
 	if err != nil {
-		http.Error(w, "end " + errorMessage, http.StatusBadRequest)
+		http.Error(w, "end "+errorMessage, http.StatusBadRequest)
 		return
 	}
 
