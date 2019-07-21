@@ -24,13 +24,12 @@ func main() {
 
 	basePath := "/api/v1"
 
-	host := getEnv("HOST", "localhost")
-	port := getEnv("PORT", "8000")
+	swaggerHost := getEnv("SWAGGER_HOST", "localhost:8000")
 
 	// programatically set swagger info
 	docs.SwaggerInfo.Title = "Rest API Spot Hero"
 	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = host + ":" + port
+	docs.SwaggerInfo.Host = swaggerHost
 	docs.SwaggerInfo.BasePath = basePath
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
@@ -45,5 +44,5 @@ func main() {
 	r.PathPrefix("/").Handler(httpSwagger.Handler(httpSwagger.URL("http://" + docs.SwaggerInfo.Host + "/docs/doc.json")))
 
 	// Start server
-	log.Fatal(http.ListenAndServe(":"+port, r))
+	log.Fatal(http.ListenAndServe(":8000", r))
 }
