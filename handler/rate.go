@@ -22,37 +22,43 @@ func dateEqual(date1, date2 time.Time) bool {
 	return y1 == y2 && m1 == m2 && d1 == d2
 }
 
-func validateDateParameters(w http.ResponseWriter, r *http.Request) error {
-	_, err := time.Parse(time.RFC3339, r.URL.Query().Get("start"))
-	errorMessage := "%v query parameter is required to be valid ISO-8601 datetime"
-	if err != nil {
-		return fmt.Errorf(errorMessage, "start")
-	}
-	_, err = time.Parse(time.RFC3339, r.URL.Query().Get("end"))
-	if err != nil {
-		return fmt.Errorf(errorMessage, "end")
-	}
-	return nil
+func timeIn(origTime time.Time, name string) time.Time {
+    loc, err := time.LoadLocation(name)
+    if err != nil {
+        panic(err)
+    }
+    return origTime.In(loc)
 }
 
-func calculateRate(dateRange model.Range) string {
+func toWeekdayAbbreviation(time time.Time) string {
+	index := int(time.Weekday())
+	weekdays := [7]string{"sun", "mon", "tues", "wed", "thurs", "fri", "sat"}
+	return weekdays[index]
+}
+func toHourMinute(time time.Time) int {
+	return time.Hour()*100 + time.Minute()
+}
 
+func calculateRate(startDate, endDate time.Time) string {
 	unavailable := "unavailable"
 	var res string
-
-	// input cannot span multiple days
-	if !dateEqual(dateRange.StartTime, dateRange.EndTime) {
-		return unavailable
-	}
-
-	weekday := dateRange.WeekdayAbbreviation()
-	start := dateRange.HourMinuteStart()
-	end := dateRange.HourMinuteEnd()
-
 	found := false
 	
 	// searching for rate
 	for _, rate := range rates.Rates {
+		// convert to timezone matching the rates data
+		startDateLoc := timeIn(startDate, rate.TimeZone)
+		endDateLoc := timeIn(endDate, rate.TimeZone)
+
+		// input cannot span multiple days
+		if !dateEqual(startDateLoc, endDateLoc) {
+			return unavailable
+		}
+
+		weekday := toWeekdayAbbreviation(startDateLoc)
+		start := toHourMinute(startDateLoc)
+		end := toHourMinute(endDateLoc)
+
 		if strings.Contains(rate.Days, weekday) &&
 			start >= rate.HourMinuteStart() && 
 			end <= rate.HourMinuteEnd() {
@@ -74,22 +80,22 @@ func calculateRate(dateRange model.Range) string {
 
 // SearchRateHandler searches rate based on start and end time
 func SearchRateHandler(w http.ResponseWriter, r *http.Request) {
-	err := validateDateParameters(w, r)
+
+	errorMessage := "query parameter is required to be valid ISO-8601 datetime"
+	start, err := time.Parse(time.RFC3339, r.URL.Query().Get("start"))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, "start " + errorMessage, http.StatusBadRequest)
+		return
+	}
+	end, err := time.Parse(time.RFC3339, r.URL.Query().Get("end"))
+	if err != nil {
+		http.Error(w, "end " + errorMessage, http.StatusBadRequest)
 		return
 	}
 
-	var dateRange model.Range
-	
-	err = decoder.Decode(&dateRange, r.URL.Query())
+	fmt.Println(start, end)
 
-	if err != nil {
-		http.Error(w, "Unable process request", http.StatusBadRequest)
-		return
-	}
-
-	res := calculateRate(dateRange)
+	res := calculateRate(start, end)
 	w.Write([]byte(res))
 }
 
